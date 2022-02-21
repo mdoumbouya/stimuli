@@ -20,13 +20,105 @@
 
 	<script type="text/javascript">
 		//<![CDATA[
-		scale = 0.5;
+		function metadata2vectors(metadata){
+			var context_features = [
+				'col1',		//stem color
+				'col2',		//spots color
+				'col3',		//petal color
+				'col4',		//center color
+				'col5',		//filament color
+				'prop1',	//centersize
+				'prop2',	//petallength
+				'tar1',		// has thorns?
+				'tar2',		// has spots?
+				'tar3',		//'has filaments?
+			];
+			var concept_features = [
+				'col1',		//stem color
+				'col2',		//spots color
+				'col3',		//petal color
+				// 'col4',		//center color
+				'col5',		//filament color
+				// 'prop1',	//centersize
+				// 'prop2',	//petallength
+				// 'tar1',		// has thorns?
+				'tar2',		// has spots?
+				'tar3',		//'has filaments?
+			];
+
+			function hexToRgb(hex) {
+				var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+				return result ? {
+					r: parseInt(result[1], 16),
+					g: parseInt(result[2], 16),
+					b: parseInt(result[3], 16)
+				} : null;
+			}
+
+
+			function encode_features(feature_names){
+				var vector = [];
+				feature_names.forEach(function(prop_name, index, array) {
+					value = metadata[prop_name];
+					if(prop_name[0] == 't'){
+						// booleans
+						value = +value;
+					}
+					else if(prop_name[0] == 'c'){
+						// colors
+						rgb = hexToRgb(value)
+						vector.push(rgb.r/256.);
+						vector.push(rgb.g/256.);
+						vector.push(rgb.b/256.);
+					}
+					else{
+						vector.push(value);
+					}
+					
+					console.log(prop_name);
+				});
+				
+				return vector;
+			}
+
+			return {
+				'context_vector': encode_features(context_features),
+				'concept_vector': encode_features(concept_features)
+			}
+		}
+
+		scale = 0.1;
 		flower_props = [
 			{
-				col2: "#00ff00", //spots color
+				class_id: 0,
+				class_name: "Brown Spot Disease",
+				col2: "#e82c07", //spots color
 				tar2: 1, 		// has spots?
 			},
 			{
+				class_id: 1,
+				class_name: "Dead Petal Disease",
+				col3: "#7d5506" //petal color
+			},
+			{
+				class_id: 2,
+				class_name: "Red Stem and Filament + Yellow Center",
+				col1: "#ff0000", //stem color
+				col4: "#ffff00", //center color
+				col5: "#ff0000", //filament color
+				tar3: 1 	//has filaments?
+			},
+			{
+				class_id: 3,
+				class_name: "Small Blue Center + Blue Stem",
+				col1: "#0914e8", //stem color
+				col4: "#0914e8", //center color
+				prop1: 0.1, 	//centersize
+			}
+			/*,
+			{
+				class_id: 4,
+				class_name: "All Properties Fixed",
 				col1: "#ff0000", //stem color
 				col2: "#ff0000", //spots color
 				col3: "#ff0000", //petal color
@@ -37,24 +129,31 @@
 				tar1: 1, 	// has thorns?
 				tar2: 1, 	// has spots?
 				tar3: 1 	//has filaments?
-			}
+			}*/
 		];
 
 
 		for (var genus_ix = 0; genus_ix < flower_props.length; genus_ix++) {
-			$("#pedagogy-items").append("<h1>Genus" + genus_ix + "</h1>")
-			for (var instance_ix = 0; instance_ix < 10; instance_ix++) {
+			var flower_properties = flower_props[genus_ix];
+			var flower_properties_str = JSON.stringify(flower_properties);
+			var class_name = flower_properties['class_name'];
+			$("#pedagogy-items").append("<h1>" + class_name + "</h1>");
+			$("#pedagogy-items").append("<div>" + flower_properties_str + "</div>");
+			
+			for (var instance_ix = 0; instance_ix < 100; instance_ix++) {
 				var svg_id = 'genus_' + genus_ix + '__instance_' + instance_ix;
-				var flower_properties = flower_props[genus_ix];
-				var metadata = JSON.stringify(flower_properties);
-				$("#pedagogy-items").append("<span id='" + svg_id + "' data-metadata='" + metadata + "' class='pedagogy-item'></span>");
-
-				Ecosystem.draw(
+				$("#pedagogy-items").append("<span id='" + svg_id + "' class='pedagogy-item'></span>");
+				var metadata = Ecosystem.draw(
 					"flower",
 					flower_properties,
 					svg_id,
 					scale
 				);
+
+				var vectors = metadata2vectors(metadata);
+				$("#" + svg_id).attr("data-metadata", JSON.stringify(metadata));
+				$("#" + svg_id).attr("data-vectors", JSON.stringify(vectors));
+				
 			}
 		}
 	//]]>
