@@ -23,27 +23,27 @@
 		function metadata2vectors(metadata){
 			var context_features = [
 				'col1',		//stem color
-				'col2',		//spots color
-				'col3',		//petal color
+				// 'col2',		//spots color
+				// 'col3',		//petal color
 				'col4',		//center color
 				'col5',		//filament color
 				'prop1',	//centersize
 				'prop2',	//petallength
 				'tar1',		// has thorns?
-				'tar2',		// has spots?
+				// 'tar2',		// has spots?
 				'tar3',		//'has filaments?
 			];
 			var concept_features = [
-				'col1',		//stem color
+				// 'col1',		//stem color
 				'col2',		//spots color
 				'col3',		//petal color
 				// 'col4',		//center color
-				'col5',		//filament color
+				// 'col5',		//filament color
 				// 'prop1',	//centersize
 				// 'prop2',	//petallength
 				// 'tar1',		// has thorns?
 				'tar2',		// has spots?
-				'tar3',		//'has filaments?
+				// 'tar3',		//'has filaments?
 			];
 
 			function hexToRgb(hex) {
@@ -57,12 +57,26 @@
 
 
 			function encode_features(feature_names){
+				// 'tar2',		// has spots?
+				// 'col2',		//spots color
+				if(+metadata['tar2']==0){
+					metadata['col2'] = "#808080";
+				}
+				// 'tar3',		//'has filaments?
+				// 'col5',		//filament color
+				if(+metadata['tar3']==0){
+					metadata['col5'] = "#808080";
+				}
+
 				var vector = [];
 				feature_names.forEach(function(prop_name, index, array) {
 					value = metadata[prop_name];
 					if(prop_name[0] == 't'){
 						// booleans
 						value = +value;
+						vector.push(value);
+						vector.push(value);
+						vector.push(value);
 					}
 					else if(prop_name[0] == 'c'){
 						// colors
@@ -72,6 +86,8 @@
 						vector.push(rgb.b/256.);
 					}
 					else{
+						vector.push(value);
+						vector.push(value);
 						vector.push(value);
 					}
 					
@@ -91,7 +107,7 @@
 		flower_props = [
 			{
 				class_id: 0,
-				class_name: "Brown Spot Disease",
+				class_name: "Red Spot Disease",
 				col2: "#e82c07", //spots color
 				tar2: 1, 		// has spots?
 			},
@@ -102,12 +118,12 @@
 			},
 			{
 				class_id: 2,
-				class_name: "Red Stem and Filament + Yellow Center",
-				col1: "#ff0000", //stem color
-				col4: "#ffff00", //center color
-				col5: "#ff0000", //filament color
-				tar3: 1 	//has filaments?
-			},
+				class_name: "Red Petal + Yellow Spots",
+				col2: "#ffff00", //spots color
+				col3: "#ff0000", //petal color
+				tar2: 1, 		// has spots?
+			}
+			/*,
 			{
 				class_id: 3,
 				class_name: "Small Blue Center + Blue Stem",
@@ -115,7 +131,7 @@
 				col4: "#0914e8", //center color
 				prop1: 0.1, 	//centersize
 			}
-			/*,
+			,
 			{
 				class_id: 4,
 				class_name: "All Properties Fixed",
@@ -149,7 +165,7 @@
 					svg_id,
 					scale
 				);
-
+				metadata['class_id'] = genus_ix;
 				var vectors = metadata2vectors(metadata);
 				$("#" + svg_id).attr("data-metadata", JSON.stringify(metadata));
 				$("#" + svg_id).attr("data-vectors", JSON.stringify(vectors));

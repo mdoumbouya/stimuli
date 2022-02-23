@@ -49,7 +49,7 @@ def dump_all(all_metadata, all_vectors, args):
 def main(args):
     session = HTMLSession()
     r = session.get(args.url)
-    r.html.render()
+    r.html.render(timeout = 2000)
     all_metadata = []
     all_vectors = {vs: [] for vs in vector_spaces}
     for item_id, item in enumerate(r.html.find(".pedagogy-item")):
