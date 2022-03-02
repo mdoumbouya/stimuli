@@ -105,6 +105,10 @@
 
 		scale = 0.1;
 		flower_props = [
+			/*{
+				class_id: -1,
+				class_name: "All flowers",
+			},*/
 			{
 				class_id: 0,
 				class_name: "Red Spot Disease",
@@ -146,6 +150,13 @@
 				tar2: 1, 	// has spots?
 				tar3: 1 	//has filaments?
 			}*/
+
+			/*
+				{stem, spots, petal, center, filament} color
+				{center, petal} size
+				presence of {thorns, spots, filaments}
+			*/
+
 		];
 
 
@@ -156,7 +167,7 @@
 			$("#pedagogy-items").append("<h1>" + class_name + "</h1>");
 			$("#pedagogy-items").append("<div>" + flower_properties_str + "</div>");
 			
-			for (var instance_ix = 0; instance_ix < 100; instance_ix++) {
+			for (var instance_ix = 0; instance_ix < 1000; instance_ix++) {
 				var svg_id = 'genus_' + genus_ix + '__instance_' + instance_ix;
 				$("#pedagogy-items").append("<span id='" + svg_id + "' class='pedagogy-item'></span>");
 				var metadata = Ecosystem.draw(
@@ -171,6 +182,9 @@
 				$("#" + svg_id).attr("data-vectors", JSON.stringify(vectors));
 				
 			}
+			$("#pedagogy-items").append(
+				'<p style="page-break-after: always;">&nbsp;</p>'
+			)
 		}
 	//]]>
 	</script>
