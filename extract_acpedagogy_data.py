@@ -5,7 +5,7 @@ import cairosvg
 import numpy as np
 import json
 
-vector_spaces = ['concept_vector', 'context_vector']
+vector_spaces = ['concept_vector', 'context_vector', 'context_vector_inclusive']
 
 def dump_item(item_metadata, item_vectors, item_svg, args):
     output_dir = Path(args.output_dir)
@@ -23,7 +23,7 @@ def dump_item(item_metadata, item_vectors, item_svg, args):
     )
 
     # dump vectors
-    for vector_name in ['concept_vector', 'context_vector']:
+    for vector_name in vector_spaces:
         vector_path = output_dir / f'{item_id}_{vector_name}.vec.txt'
         vector = np.array(item_vectors[vector_name])
         np.savetxt(
