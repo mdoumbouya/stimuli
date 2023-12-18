@@ -5,7 +5,14 @@ import cairosvg
 import numpy as np
 import json
 
-vector_spaces = ['concept_vector', 'context_vector', 'context_vector_inclusive']
+vector_spaces = [
+    'concept_vector', 
+    'context_vector', 
+    'context_vector_inclusive',
+    'class_0_concept_vector',
+    'class_1_concept_vector',
+    'class_2_concept_vector'
+]
 
 def dump_item(item_metadata, item_vectors, item_svg, args):
     output_dir = Path(args.output_dir)

@@ -20,7 +20,7 @@
 
 	<script type="text/javascript">
 		//<![CDATA[
-		function metadata2vectors(metadata){
+		function metadata2vectors(metadata, flower_props){
 			var context_features = [
 				'col1',		//stem color
 				// 'col2',		//spots color
@@ -61,11 +61,13 @@
 				// 'col2',		//spots color
 				if(+metadata['tar2']==0){
 					metadata['col2'] = "#808080";
+					// metadata['col2'] = "#ca8e2e"; //empirical mean
 				}
 				// 'tar3',		//'has filaments?
 				// 'col5',		//filament color
 				if(+metadata['tar3']==0){
 					metadata['col5'] = "#808080";
+					// metadata['col5'] = "#768781";//empirical mean
 				}
 
 				var vector = [];
@@ -74,13 +76,14 @@
 					if(prop_name[0] == 't'){
 						// booleans
 						value = +value;
+						// value = value?1:-1; 
 						vector.push(value);
 						vector.push(value);
 						vector.push(value);
 					}
 					else if(prop_name[0] == 'c'){
 						// colors
-						rgb = hexToRgb(value)
+						rgb = hexToRgb(value);
 						vector.push(rgb.r/256.);
 						vector.push(rgb.g/256.);
 						vector.push(rgb.b/256.);
@@ -90,17 +93,26 @@
 						vector.push(value);
 						vector.push(value);
 					}
-					
-					console.log(prop_name);
 				});
 				
 				return vector;
 			}
 
-			return {
-				'context_vector': encode_features(context_features),
-				'concept_vector': encode_features(concept_features)
-			}
+			vectors = {}
+			for(var genus_ix=0; genus_ix < flower_props.length; genus_ix++){
+				var flower_properties = flower_props[genus_ix];
+				class_concept_vector = encode_features(
+					flower_properties['concept_feature_names']
+				)
+				class_concept_vector_name = "class_" + genus_ix + "_concept_vector"
+				vectors[class_concept_vector_name] = class_concept_vector
+			}	
+
+			vectors['context_vector'] = encode_features(context_features);
+			vectors['context_vector_inclusive'] = encode_features(context_features.concat(concept_features));
+			vectors['concept_vector'] = encode_features(concept_features);
+
+			return vectors;
 		}
 
 		scale = 0.1;
@@ -111,17 +123,20 @@
 			},*/
 			{
 				class_id: 0,
+				concept_feature_names: ['col2', 'tar2'],
 				class_name: "Red Spot Disease",
 				col2: "#e82c07", //spots color
 				tar2: 1, 		// has spots?
 			},
 			{
 				class_id: 1,
+				concept_feature_names: ['col3'],
 				class_name: "Dead Petal Disease",
 				col3: "#7d5506" //petal color
 			},
 			{
 				class_id: 2,
+				concept_feature_names: ['col2', 'col3', 'tar2'],
 				class_name: "Red Petal + Yellow Spots",
 				col2: "#ffff00", //spots color
 				col3: "#ff0000", //petal color
@@ -177,7 +192,7 @@
 					scale
 				);
 				metadata['class_id'] = genus_ix;
-				var vectors = metadata2vectors(metadata);
+				var vectors = metadata2vectors(metadata, flower_props);
 				$("#" + svg_id).attr("data-metadata", JSON.stringify(metadata));
 				$("#" + svg_id).attr("data-vectors", JSON.stringify(vectors));
 				
